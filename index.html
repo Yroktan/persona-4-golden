@@ -1,0 +1,2754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PERSONA 4 // GOLDEN REVIVAL [CAMP MENU]</title>
+  
+  <!-- High-legibility Google Fonts: Rajdhani for display, Plus Jakarta Sans for reading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --p4-yellow: #ffe600;
+      --p4-yellow-dim: #e6cf00;
+      --p4-yellow-glow: rgba(255, 230, 0, 0.45);
+      --p4-dark: #0a0b10;
+      --p4-surface: #141622;
+      --p4-surface-elevated: #1e2030;
+      --p4-orange: #ff5500;
+      --p4-orange-glow: rgba(255, 85, 0, 0.35);
+      --p4-white: #ffffff;
+      --p4-cyan: #00e5ff;
+      --p4-rainbow: linear-gradient(90deg, #ff0055 0%, #ff5500 16%, #ffe600 33%, #00e676 50%, #00f0ff 66%, #2979ff 83%, #d500f9 100%);
+      --skew-deg: -8.5deg;
+      --unskew-deg: 8.5deg;
+
+      --font-display: 'Rajdhani', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      font-family: var(--font-display);
+      background-color: var(--p4-dark);
+      color: #fff;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+
+      /* Persona 4 Golden fluid animated caustics with electric P4 yellow rays */
+      background-image: 
+        radial-gradient(circle at 80% 35%, rgba(255, 230, 0, 0.22) 0%, transparent 55%),
+        radial-gradient(circle at 20% 75%, rgba(255, 85, 0, 0.18) 0%, transparent 45%),
+        radial-gradient(circle, rgba(255, 230, 0, 0.08) 15%, transparent 16%),
+        linear-gradient(135deg, #090a0e 0%, #12141e 50%, #07080b 100%);
+      background-size: 100% 100%, 100% 100%, 32px 32px, 100% 100%;
+      background-position: 0 0, 0 0, 0 0, 0 0;
+      animation: p4gBgFlow 24s linear infinite;
+    }
+
+    @keyframes p4gBgFlow {
+      0% { background-position: 0 0, 0 0, 0 0, 0 0; }
+      100% { background-position: 100px 50px, -100px -50px, 64px 64px, 0 0; }
+    }
+
+    /* CRT Scanlines & Broadcast Vignette */
+    .scanlines {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(10, 11, 16, 0.14) 50%);
+      background-size: 100% 4px;
+      z-index: 150;
+      transition: opacity 0.3s ease;
+    }
+
+    .vignette-overlay {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      box-shadow: inset 0 0 140px rgba(0,0,0,0.85);
+      z-index: 140;
+    }
+
+    /* Ambient Midnight Channel diagonal ticker */
+    .bg-ticker {
+      position: fixed;
+      top: 50%;
+      left: -20%;
+      width: 140%;
+      height: 44px;
+      background: rgba(255, 230, 0, 0.03);
+      border-top: 2px dashed rgba(255, 230, 0, 0.12);
+      border-bottom: 2px dashed rgba(255, 230, 0, 0.12);
+      transform: rotate(-9deg);
+      pointer-events: none;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      white-space: nowrap;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      color: rgba(255, 230, 0, 0.16);
+    }
+    .bg-ticker-content {
+      display: inline-block;
+      animation: tickerMove 25s linear infinite;
+    }
+    @keyframes tickerMove {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* Skew Helpers */
+    .skew { transform: skewX(var(--skew-deg)); }
+    .unskew { transform: skewX(var(--unskew-deg)); display: inline-block; }
+
+    /* ===================================================
+       HEADER HUD (LOGO, BRATSK REAL-TIME CLOCK & WEATHER, BGM)
+       =================================================== */
+    .p4g-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      z-index: 30;
+      position: relative;
+      gap: 12px;
+      animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .title-cluster {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .p4g-logo-badge {
+      background: #000;
+      color: var(--p4-yellow);
+      border: 3px solid var(--p4-yellow);
+      box-shadow: 4px 4px 0 #000, 0 0 16px var(--p4-yellow-glow);
+      padding: 4px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .p4g-logo-badge .title-text {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .p4g-logo-badge .edition-pill {
+      background: var(--p4-orange);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      letter-spacing: 1.5px;
+    }
+
+    .rainbow-strip {
+      background: var(--p4-rainbow);
+      height: 20px;
+      width: 70px;
+      border: 2px solid #000;
+      box-shadow: 2px 2px 0 var(--p4-yellow);
+    }
+    @media (min-width: 900px) {
+      .rainbow-strip { width: 110px; height: 22px; }
+    }
+
+    /* Bratsk Calendar & Real-time Weather HUD */
+    .p4g-calendar-hud {
+      display: flex;
+      background: rgba(14, 16, 24, 0.92);
+      border: 2px solid var(--p4-yellow);
+      box-shadow: 3px 3px 0 #000;
+      padding: 5px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.15s ease;
+    }
+    .p4g-calendar-hud:hover {
+      transform: skewX(var(--skew-deg)) translateY(-2px);
+    }
+    .weather-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--p4-yellow);
+      font-weight: 800;
+    }
+    .weather-pulse {
+      width: 8px;
+      height: 8px;
+      background: var(--p4-orange);
+      border-radius: 50%;
+      animation: pulseAlert 1.2s infinite;
+    }
+    @keyframes pulseAlert {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(1.3); }
+    }
+
+    /* BGM Widget */
+    .bgm-widget {
+      background: #000;
+      color: #fff;
+      border: 2px solid var(--p4-yellow);
+      box-shadow: 3px 3px 0 #000, 0 0 12px var(--p4-yellow-glow);
+      padding: 4px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.15s ease;
+    }
+    .bgm-widget:hover {
+      transform: skewX(var(--skew-deg)) translateY(-2px);
+    }
+    .bgm-tag {
+      background: var(--p4-yellow);
+      color: #000;
+      border: none;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 800;
+      font-family: var(--font-display);
+      cursor: pointer;
+    }
+    .equalizer {
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 14px;
+    }
+    .eq-bar {
+      width: 3px;
+      background: var(--p4-yellow);
+      box-shadow: 0 0 4px var(--p4-yellow-glow);
+      animation: bounceRevival 0.6s infinite ease-in-out alternate;
+    }
+    .eq-bar:nth-child(1) { height: 6px; animation-delay: 0.05s; }
+    .eq-bar:nth-child(2) { height: 12px; animation-delay: 0.2s; }
+    .eq-bar:nth-child(3) { height: 14px; animation-delay: 0.35s; }
+    .eq-bar:nth-child(4) { height: 9px; animation-delay: 0.1s; }
+    .eq-bar:nth-child(5) { height: 13px; animation-delay: 0.45s; }
+    .eq-paused .eq-bar { animation: none !important; height: 3px !important; }
+
+    @keyframes bounceRevival {
+      0% { height: 3px; }
+      100% { height: 14px; }
+    }
+
+    /* ===================================================
+       MAIN CAMP STAGE (P4G DYNAMIC BUTTON CHAIN & STAGE)
+       =================================================== */
+    .p4g-stage {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      position: relative;
+      z-index: 10;
+      overflow: hidden;
+      min-height: 0;
+    }
+    @media (min-width: 1000px) {
+      .p4g-stage {
+        display: grid;
+        grid-template-columns: 260px minmax(520px, 680px) 1fr;
+        gap: 28px;
+        align-items: center;
+      }
+    }
+
+    /* ---------------------------------------------------
+       1. VERTICAL RIBBON BLADE BUTTONS (LEFT COLUMN)
+       --------------------------------------------------- */
+    .p4g-nav-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 260px;
+      z-index: 25;
+      animation: p4gNavEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes p4gNavEntrance {
+      from { transform: translateX(-60px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* The iconic Angled Ribbon Blades */
+    .p4g-blade-btn {
+      background: #11131c;
+      color: #fff;
+      border: 2px solid #232738;
+      border-left: 6px solid #555;
+      padding: 12px 18px;
+      font-family: var(--font-display);
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.85);
+      transform: skewX(var(--skew-deg));
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .p4g-blade-btn .btn-num {
+      font-size: 13px;
+      color: #888;
+      font-weight: 800;
+      margin-right: 10px;
+      letter-spacing: 1px;
+    }
+    .p4g-blade-btn .btn-label {
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .p4g-blade-btn .btn-arrow {
+      opacity: 0;
+      transform: translateX(-8px);
+      transition: all 0.18s ease;
+      color: #000;
+      font-size: 16px;
+    }
+
+    /* Hover effect */
+    .p4g-blade-btn:hover {
+      transform: skewX(var(--skew-deg)) translateX(14px);
+      background: #1c1f2e;
+      border-left-color: var(--p4-yellow);
+      box-shadow: 6px 6px 0 rgba(0,0,0,0.9);
+    }
+    .p4g-blade-btn:hover .btn-num {
+      color: var(--p4-yellow);
+    }
+
+    /* ACTIVE BUTTON (SLIDE-OUT WITH ELECTRIC YELLOW FILL) */
+    .p4g-blade-btn.active {
+      background: var(--p4-yellow);
+      color: #000;
+      border-color: #000;
+      border-left: 8px solid var(--p4-orange);
+      transform: skewX(var(--skew-deg)) translateX(26px) scale(1.04);
+      box-shadow: 8px 8px 0 #000, 0 0 24px var(--p4-yellow-glow);
+    }
+    .p4g-blade-btn.active .btn-num {
+      color: var(--p4-orange);
+    }
+    .p4g-blade-btn.active .btn-arrow {
+      opacity: 1;
+      transform: translateX(0);
+      display: inline-block;
+    }
+
+    /* ---------------------------------------------------
+       2. CENTER CONTENT WINDOW (EXPANDED "УГОЛЬНИК")
+       Spacious width (680px) and zero text clipping
+       --------------------------------------------------- */
+    .p4g-content-window {
+      position: relative;
+      z-index: 20;
+      width: 100%;
+      max-width: 680px;
+      height: 500px;
+      max-height: calc(100vh - 150px);
+      background: rgba(14, 16, 24, 0.95);
+      border: 3px solid var(--p4-yellow);
+      box-shadow: 6px 6px 0 #000, 0 0 35px rgba(255, 230, 0, 0.35);
+      padding: 20px 36px;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      transform: skewX(var(--skew-deg));
+      animation: p4gWindowEntrance 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes p4gWindowEntrance {
+      from { transform: skewX(var(--skew-deg)) translateX(30px); opacity: 0; }
+      to { transform: skewX(var(--skew-deg)) translateX(0); opacity: 1; }
+    }
+
+    .window-inner {
+      transform: skewX(var(--unskew-deg));
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      min-width: 0;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .window-header {
+      border-bottom: 3px solid var(--p4-yellow);
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 12px;
+      flex-shrink: 0;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+    .window-header-titles {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .window-tag {
+      display: inline-block;
+      background: var(--p4-yellow);
+      color: #000;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 8px;
+      letter-spacing: 1.5px;
+      line-height: 1.2;
+      margin-bottom: 3px;
+      white-space: nowrap;
+    }
+    .window-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #fff;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .window-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .window-extra {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--p4-yellow);
+      white-space: nowrap;
+    }
+    .header-action-btn {
+      background: #000;
+      color: var(--p4-yellow);
+      border: 1.5px solid var(--p4-yellow);
+      padding: 2px 10px;
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 #000;
+      transition: all 0.12s ease;
+    }
+    .header-action-btn:hover {
+      background: var(--p4-yellow);
+      color: #000;
+    }
+
+    /* Content Panels */
+    .p4g-panel {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 8px;
+      padding-bottom: 4px;
+      box-sizing: border-box;
+    }
+    .p4g-panel.active {
+      display: flex;
+      animation: panelFade 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes panelFade {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Custom Scrollbar */
+    .p4g-panel::-webkit-scrollbar { width: 5px; }
+    .p4g-panel::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.35); }
+    .p4g-panel::-webkit-scrollbar-thumb {
+      background: var(--p4-yellow);
+      border: 1px solid #000;
+    }
+
+    /* High-contrast Cards */
+    .p4g-card {
+      border: 2px solid #2d3144;
+      background: #161826;
+      padding: 9px 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.15s ease;
+      box-shadow: 2px 2px 0 #000;
+      flex-shrink: 0;
+      min-width: 0;
+      box-sizing: border-box;
+      overflow: hidden;
+      position: relative;
+    }
+    .p4g-card:hover {
+      border-color: var(--p4-yellow);
+      background: #1e2133;
+      transform: translateX(4px);
+      box-shadow: 4px 4px 0 #000;
+    }
+    .p4g-card.highlight {
+      border-color: var(--p4-yellow);
+      background: #212335;
+      box-shadow: 3px 3px 0 var(--p4-orange);
+    }
+    .p4g-card.completed {
+      opacity: 0.65;
+      border-color: #16a34a;
+      background: #121c17;
+    }
+
+    .card-heading {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+      flex: 1;
+    }
+    .card-desc {
+      font-family: var(--font-body);
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #b0b4c8;
+      line-height: 1.4;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
+    .card-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .card-btn {
+      background: #1e2233;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      padding: 2px 8px;
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+    .card-btn:hover {
+      background: var(--p4-yellow);
+      color: #000;
+      border-color: #000;
+    }
+    .card-btn.btn-done {
+      border-color: #16a34a;
+      color: #4ade80;
+    }
+    .card-btn.btn-done:hover {
+      background: #16a34a;
+      color: #fff;
+    }
+    .card-btn.btn-delete {
+      border-color: #ef4444;
+      color: #f87171;
+    }
+    .card-btn.btn-delete:hover {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    /* Element Affinities */
+    .element-badge {
+      font-family: var(--font-display);
+      background: #000;
+      color: var(--p4-yellow);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 2px;
+      border: 1px solid var(--p4-yellow);
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+    .badge-status {
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 2px;
+      border: 1px solid #000;
+      white-space: nowrap;
+    }
+    .status-done { background: #16a34a; color: #fff; }
+    .status-active { background: var(--p4-yellow); color: #000; }
+    .status-pending { background: #475569; color: #fff; }
+    .status-tier { background: var(--p4-orange); color: #fff; }
+    .status-tier-1 { background: #334155; color: #cbd5e1; border: 1px solid #64748b; }
+    .status-tier-2 { background: var(--p4-orange); color: #fff; border: 1px solid #ea580c; }
+    .status-tier-3 { background: var(--p4-yellow); color: #000; border: 1px solid #ca8a04; font-weight: 800; }
+    .status-tier-max {
+      background: var(--p4-rainbow);
+      color: #fff;
+      border: 1px solid #fff;
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.6);
+      font-weight: 800;
+      animation: rainbowPulse 2s infinite alternate;
+    }
+    @keyframes rainbowPulse {
+      0% { filter: brightness(1) drop-shadow(0 0 2px #ffe600); }
+      100% { filter: brightness(1.2) drop-shadow(0 0 6px #00e5ff); }
+    }
+    .p4g-card.maxed {
+      border-color: var(--p4-cyan);
+      box-shadow: 3px 3px 0 var(--p4-cyan), 0 0 14px rgba(0, 229, 255, 0.3);
+    }
+    .btn-tier-up {
+      border-color: var(--p4-yellow);
+      color: var(--p4-yellow);
+      font-weight: 800;
+    }
+    .btn-tier-up:hover {
+      background: var(--p4-yellow);
+      color: #000;
+    }
+
+    /* Jukebox Modal & Player Styles */
+    .jukebox-modal-box {
+      max-width: 540px;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    .jukebox-now-playing {
+      background: #181a28;
+      border: 2px solid var(--p4-yellow);
+      box-shadow: 4px 4px 0 #000;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .jb-timeline-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+    .jb-range {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      background: #2b2f44;
+      outline: none;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+    .jb-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      background: var(--p4-yellow);
+      border: 2px solid #000;
+      cursor: pointer;
+      box-shadow: 0 0 6px var(--p4-yellow-glow);
+    }
+    .jb-controls-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .jb-upload-section {
+      border: 2px dashed var(--p4-yellow);
+      background: rgba(255, 230, 0, 0.04);
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .jb-upload-section:hover, .jb-upload-section.drag-active {
+      background: rgba(255, 230, 0, 0.12);
+      border-color: var(--p4-orange);
+      transform: translateY(-1px);
+    }
+    .jb-playlist-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 170px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .jb-playlist-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 10px;
+      background: #161826;
+      border: 1px solid #2d3144;
+      cursor: pointer;
+      transition: all 0.12s ease;
+      min-width: 0;
+    }
+    .jb-playlist-item:hover {
+      background: #202336;
+      border-color: var(--p4-yellow);
+    }
+    .jb-playlist-item.active {
+      background: #23273e;
+      border-color: var(--p4-yellow);
+      box-shadow: 2px 2px 0 var(--p4-orange);
+    }
+
+    /* Arcana Cards */
+    .arcana-card {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .arcana-num {
+      background: #000;
+      color: var(--p4-yellow);
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      border: 2px solid var(--p4-yellow);
+      box-shadow: 2px 2px 0 var(--p4-orange);
+      flex-shrink: 0;
+    }
+
+    /* System Toggles */
+    .sys-btn {
+      background: #334155;
+      color: #fff;
+      border: 2px solid #000;
+      padding: 4px 12px;
+      font-weight: 800;
+      font-family: var(--font-display);
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 #000;
+      transition: all 0.1s ease;
+    }
+    .sys-btn.active {
+      background: var(--p4-yellow);
+      color: #000;
+      border-color: #000;
+    }
+
+    /* Quick Add Modal in P4G Style */
+    .quick-modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 90;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(6px);
+      padding: 20px;
+    }
+    .quick-modal-overlay.active {
+      display: flex;
+    }
+    .quick-modal-box {
+      width: 100%;
+      max-width: 480px;
+      background: #11131c;
+      border: 3px solid var(--p4-yellow);
+      box-shadow: 8px 8px 0 #000, 0 0 30px var(--p4-yellow-glow);
+      padding: 18px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .modal-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--p4-yellow);
+      border-bottom: 2px solid var(--p4-yellow);
+      padding-bottom: 6px;
+    }
+    .modal-input {
+      width: 100%;
+      background: #1a1d2b;
+      border: 1.5px solid #334155;
+      color: #fff;
+      padding: 8px 12px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+    }
+    .modal-input:focus {
+      border-color: var(--p4-yellow);
+      box-shadow: 0 0 8px var(--p4-yellow-glow);
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    /* ---------------------------------------------------
+       3. PROTAGONIST SHOWCASE (RIGHT COLUMN // DFT BATTLE STANCE)
+       --------------------------------------------------- */
+    .p4g-protagonist-area {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      top: 0;
+      width: 48%;
+      z-index: 15;
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-end;
+      pointer-events: none;
+    }
+    @media (max-width: 959px) {
+      .p4g-protagonist-area {
+        width: 100%;
+        opacity: 0.22;
+        z-index: 5;
+      }
+    }
+
+    /* Character sprite container leaning against right frame */
+    .hero-sprite-container {
+      position: absolute;
+      right: 0px;
+      bottom: 0px;
+      height: 100%;
+      max-height: calc(100vh - 120px);
+      width: 100%;
+      max-width: 580px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-end;
+      transform-origin: right 85%;
+      will-change: transform;
+      animation: heroLeanSway 4.4s ease-in-out infinite alternate;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    /* Leaning pose against the right edge */
+    @keyframes heroLeanSway {
+      0% {
+        transform: rotate(2deg) translateY(0) scale(1);
+      }
+      50% {
+        transform: rotate(2.8deg) translateY(-8px) scale(1.012);
+      }
+      100% {
+        transform: rotate(1.8deg) translateY(-3px) scale(1.006);
+      }
+    }
+
+    /* Action Burst on Click */
+    .hero-sprite-container.pulse-action {
+      animation: heroPulse 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes heroPulse {
+      0% { transform: rotate(2deg) scale(1); filter: brightness(1); }
+      30% { transform: rotate(3.2deg) scale(1.05) translateY(-16px); filter: brightness(1.3) drop-shadow(0 0 35px var(--p4-yellow)); }
+      100% { transform: rotate(2deg) scale(1); filter: brightness(1); }
+    }
+
+    /* Shadow Aura Silhouette behind DFT */
+    .hero-shadow-layer {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('pose_battle.webp');
+      background-position: right bottom;
+      background-size: contain;
+      background-repeat: no-repeat;
+      filter: brightness(0) blur(6px) drop-shadow(-10px 8px 0px rgba(0,0,0,0.95));
+      opacity: 0.75;
+      transform: translate(-10px, 8px);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Main Protagonist Image - 100% crisp & full visibility */
+    .hero-main-sprite {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: right bottom;
+      filter: contrast(1.12) brightness(1.06) drop-shadow(-10px 8px 0px rgba(0,0,0,0.95)) drop-shadow(0 0 20px rgba(255,230,0,0.4));
+      z-index: 2;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    /* Critical Cut-in Banner Flash */
+    .crit-flash-overlay {
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%) skewX(var(--skew-deg));
+      height: 100px;
+      background: #000;
+      border-top: 4px solid var(--p4-yellow);
+      border-bottom: 4px solid var(--p4-yellow);
+      box-shadow: 0 0 30px rgba(255, 230, 0, 0.7);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .crit-flash-overlay.flash {
+      opacity: 1;
+      transform: translateY(-50%) skewX(var(--skew-deg)) scale(1.04);
+    }
+    .crit-flash-overlay img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      filter: contrast(1.15) brightness(1.05);
+    }
+
+    /* Toast Notification */
+    .reward-toast {
+      position: fixed;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #000;
+      color: var(--p4-yellow);
+      border: 2px solid var(--p4-yellow);
+      box-shadow: 4px 4px 0 var(--p4-orange), 0 0 20px var(--p4-yellow-glow);
+      padding: 8px 20px;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reward-toast.active {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ===================================================
+       BOTTOM STATUS HUD (LEVEL / HP / SP / MONEY)
+       =================================================== */
+    .p4g-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 24px;
+      z-index: 30;
+      background: rgba(10, 11, 16, 0.95);
+      border-top: 3px solid var(--p4-yellow);
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.8);
+      position: relative;
+    }
+
+    .p4g-protag-stats {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .protag-name-badge {
+      background: var(--p4-yellow);
+      color: #000;
+      padding: 3px 10px;
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: 1px;
+    }
+    .stat-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .stat-pill .stat-label {
+      color: var(--p4-yellow);
+      font-size: 11px;
+    }
+
+    /* Protagonist Stance Badge (Locked to Battle Pose) */
+    .stance-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 12px;
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(255, 230, 0, 0.45);
+      box-shadow: 2px 2px 0 #000;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .stance-badge .stat-label {
+      color: var(--p4-yellow);
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
+
+    /* Controls Key Guides */
+    .controls-hint {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #94a3b8;
+    }
+    .key-cap {
+      background: #334155;
+      color: #fff;
+      padding: 1px 6px;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Looping BGM: Heartbeat, Heartbreak -->
+  <audio id="bgm" loop preload="auto">
+    <source src="heartbeat.mp3" type="audio/mpeg">
+    <source src="https://ia800902.us.archive.org/3/items/persona-4-ost/1-09%20Heartbeat%2C%20Heartbreak.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- CRT Scanlines & Broadcast Vignette -->
+  <div class="scanlines"></div>
+  <div class="vignette-overlay"></div>
+
+  <!-- Ambient Midnight Channel Ticker Tape (100% Persona 4 Golden) -->
+  <div class="bg-ticker">
+    <div class="bg-ticker-content">
+      MIDNIGHT CHANNEL // PERSONA 4 GOLDEN REVIVAL // INVESTIGATION UNIT HQ // INABA FOG WARNING // DFT ONLINE // BRATSK WEATHER LINK ACTIVE // VELVET ROOM SYNC //&nbsp;&nbsp;&nbsp;&nbsp;MIDNIGHT CHANNEL // PERSONA 4 GOLDEN REVIVAL // INVESTIGATION UNIT HQ // INABA FOG WARNING // DFT ONLINE // BRATSK WEATHER LINK ACTIVE // VELVET ROOM SYNC //
+    </div>
+  </div>
+
+  <!-- CRITICAL CUT-IN FLASH (ON TAB SWITCH OR CHARACTER CLICK) -->
+  <div class="crit-flash-overlay" id="crit-flash">
+    <img src="cutin.png" alt="Critical Cut-in">
+  </div>
+
+  <!-- TOAST REWARD NOTIFICATION -->
+  <div class="reward-toast" id="reward-toast">+5,000 EXP & YEN GAINED!</div>
+
+  <!-- QUICK ADD MODAL (P4G THEMED) -->
+  <div class="quick-modal-overlay" id="quick-modal">
+    <div class="quick-modal-box">
+      <div class="modal-title" id="modal-title">ADD INVESTIGATION QUEST</div>
+      <input type="text" id="modal-input-title" class="modal-input" placeholder="Quest Title (e.g. Defeat Golden Hand in Bathhouse)">
+      <input type="text" id="modal-input-desc" class="modal-input" placeholder="Quest Description (e.g. Search Floor 5 during rain)">
+      <div class="modal-actions">
+        <button class="sys-btn" onclick="closeModal()">CANCEL</button>
+        <button class="sys-btn active" onclick="confirmModal()">CONFIRM</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INABA JUKEBOX & CUSTOM AUDIO PLAYER MODAL -->
+  <div class="quick-modal-overlay" id="jukebox-modal">
+    <div class="quick-modal-box jukebox-modal-box">
+      <div class="modal-title" style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span>INABA MIDNIGHT JUKEBOX</span>
+          <span style="font-size: 10px; background: var(--p4-orange); color: #fff; padding: 2px 6px; letter-spacing: 1px;">AUDIO ENGINE</span>
+        </div>
+        <button class="sys-btn" onclick="closeJukebox()" style="padding: 2px 8px; font-size: 12px;">&#10005; CLOSE</button>
+      </div>
+
+      <!-- Now Playing Display -->
+      <div class="jukebox-now-playing">
+        <div class="jukebox-track-info">
+          <div class="card-row">
+            <span class="element-badge" id="jb-track-badge">P4 OST</span>
+            <span style="font-size: 11px; color: var(--p4-yellow); font-weight: 700;" id="jb-track-time">00:00 / 00:00</span>
+          </div>
+          <div class="card-heading" id="jb-track-title" style="font-size: 17px; margin-top: 4px;">Heartbeat, Heartbreak</div>
+          <div class="card-desc" id="jb-track-sub">Shoji Meguro // Persona 4 Golden Original Soundtrack</div>
+        </div>
+
+        <!-- Scrubber Timeline -->
+        <div class="jb-timeline-row">
+          <input type="range" id="jb-timeline" min="0" max="100" value="0" step="0.1" class="jb-range" oninput="handleTimelineSeek(event)">
+        </div>
+
+        <!-- Player Controls -->
+        <div class="jb-controls-row">
+          <button class="card-btn" onclick="prevTrack()" title="Previous Track">&#9198; PREV</button>
+          <button class="card-btn" id="jb-play-btn" onclick="toggleBGM()" style="background: var(--p4-yellow); color: #000; font-weight: 800; padding: 4px 14px;">&#9654; PLAY</button>
+          <button class="card-btn" onclick="nextTrack()" title="Next Track">&#9197; NEXT</button>
+          <button class="card-btn" id="jb-loop-btn" onclick="toggleLoop()" style="font-size: 10px;">LOOP: ALL</button>
+          
+          <!-- Volume Control -->
+          <div style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
+            <span style="font-size: 11px; color: var(--p4-yellow); font-weight: 800;">VOL</span>
+            <input type="range" id="jb-volume" min="0" max="1" step="0.05" value="0.8" class="jb-range" style="width: 70px;" oninput="handleVolumeChange(event)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload Audio Files Dropzone / Button -->
+      <div class="jb-upload-section" onclick="document.getElementById('audio-file-input').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+        <input type="file" id="audio-file-input" accept="audio/*" multiple style="display: none;" onchange="handleAudioUpload(event)">
+        <div style="font-size: 13px; font-weight: 800; color: var(--p4-yellow); display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <span>&#128193; LOAD AUDIO FILES (MP3 / WAV / OGG / FLAC)</span>
+        </div>
+        <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">
+          Click here or drop audio files to queue into playlist
+        </div>
+      </div>
+
+      <!-- Playlist Queue -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
+        <span style="font-size: 11px; font-weight: 800; color: #fff; letter-spacing: 1px;">PLAYLIST QUEUE (<span id="jb-playlist-count">1</span> TRACKS)</span>
+        <button class="card-btn" onclick="clearCustomTracks()" style="font-size: 10px; color: #f87171; border-color: #ef4444;">CLEAR CUSTOM</button>
+      </div>
+      <div class="jb-playlist-container" id="jb-playlist-list"></div>
+    </div>
+  </div>
+
+  <!-- ===================================================
+       TOP HUD (LOGO, BRATSK REAL-TIME CLOCK & WEATHER, BGM)
+       =================================================== -->
+  <header class="p4g-header">
+    <div class="title-cluster">
+      <div class="skew p4g-logo-badge">
+        <span class="unskew title-text">PERSONA 4</span>
+        <span class="unskew edition-pill">GOLDEN</span>
+      </div>
+      <div class="skew rainbow-strip"></div>
+    </div>
+
+    <!-- Bratsk Real-time Calendar & Live Weather Widget (Asia/Irkutsk UTC+8) -->
+    <div class="skew p4g-calendar-hud" onclick="fetchBratskWeather()" title="Click to refresh Bratsk weather telemetry">
+      <div class="unskew" style="display:flex; align-items:center; gap:8px;">
+        <span id="bratsk-clock">--/-- [---] --:-- // LOADING</span>
+        <span style="color:#555;">|</span>
+        <div class="weather-indicator">
+          <div class="weather-pulse" id="weather-pulse"></div>
+          <span id="bratsk-weather">BRATSK // LOADING...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BGM & Jukebox Widget -->
+    <div class="skew bgm-widget" onclick="openJukebox()" title="Click to open Inaba Jukebox Player">
+      <div class="unskew" style="display: flex; align-items: center; gap: 8px;">
+        <div class="equalizer eq-paused" id="eq">
+          <div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+          <div class="eq-bar"></div>
+        </div>
+        <span id="bgm-title" style="font-size: 12px; font-weight: 700; max-width: 105px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">HEARTBEAT</span>
+        <button class="bgm-tag" id="bgm-status" onclick="event.stopPropagation(); toggleBGM();">PLAY</button>
+        <button class="bgm-tag" style="background: var(--p4-orange); color: #fff;" onclick="event.stopPropagation(); openJukebox();">&#9835;</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================
+       MAIN CAMP STAGE (P4G LAYOUT: BUTTON CASCADE + CONTENT + DFT)
+       =================================================== -->
+  <main class="p4g-stage">
+    
+    <!-- 1. VERTICAL RIBBON BLADE BUTTONS (LEFT COLUMN) -->
+    <nav class="p4g-nav-stack">
+      <button onclick="switchTab(0)" class="p4g-blade-btn active" id="btn-0">
+        <span class="unskew">
+          <span class="btn-num">01</span>
+          <span class="btn-label">TASKS</span>
+        </span>
+        <span class="unskew btn-arrow">&#9654;</span>
+      </button>
+
+      <button onclick="switchTab(1)" class="p4g-blade-btn" id="btn-1">
+        <span class="unskew">
+          <span class="btn-num">02</span>
+          <span class="btn-label">SKILLS</span>
+        </span>
+        <span class="unskew btn-arrow">&#9654;</span>
+      </button>
+
+      <button onclick="switchTab(2)" class="p4g-blade-btn" id="btn-2">
+        <span class="unskew">
+          <span class="btn-num">03</span>
+          <span class="btn-label">PROJECTS</span>
+        </span>
+        <span class="unskew btn-arrow">&#9654;</span>
+      </button>
+
+      <button onclick="switchTab(3)" class="p4g-blade-btn" id="btn-3">
+        <span class="unskew">
+          <span class="btn-num">04</span>
+          <span class="btn-label">S.LINK</span>
+        </span>
+        <span class="unskew btn-arrow">&#9654;</span>
+      </button>
+
+      <button onclick="switchTab(4)" class="p4g-blade-btn" id="btn-4">
+        <span class="unskew">
+          <span class="btn-num">05</span>
+          <span class="btn-label">SYSTEM</span>
+        </span>
+        <span class="unskew btn-arrow">&#9654;</span>
+      </button>
+    </nav>
+
+    <!-- 2. CENTER CONTENT WINDOW (DETAIL INSPECTOR // EXPANDED "УГОЛЬНИК") -->
+    <section class="p4g-content-window" id="content-window">
+      <div class="window-inner">
+        <div class="window-header">
+          <div class="window-header-titles">
+            <span class="window-tag" id="window-tag">INVESTIGATION LOG</span>
+            <h2 class="window-title" id="window-title">CURRENT TASKS</h2>
+          </div>
+          <div class="window-header-actions">
+            <span class="window-extra" id="window-extra">3 ACTIVE</span>
+            <button class="header-action-btn" id="header-action-btn" onclick="handleHeaderAction()">+ ADD</button>
+          </div>
+        </div>
+
+        <!-- TAB 0: TASKS (INTERACTIVE WITH LOCALSTORAGE & AUTO-REPLENISHMENT) -->
+        <div class="p4g-panel active" id="panel-0">
+          <div id="tasks-list-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+
+        <!-- TAB 1: SKILLS (INTERACTIVE TIER SYSTEM & LOCALSTORAGE) -->
+        <div class="p4g-panel" id="panel-1">
+          <div id="skills-list-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+
+        <!-- TAB 2: PROJECTS (INTERACTIVE WITH LOCALSTORAGE & AUTO-REPLENISHMENT) -->
+        <div class="p4g-panel" id="panel-2">
+          <div id="projects-list-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+        </div>
+
+        <!-- TAB 3: S.LINK -->
+        <div class="p4g-panel" id="panel-3">
+          <a href="https://t.me/Yroktan" target="_blank" rel="noopener noreferrer" class="p4g-card arcana-card">
+            <div class="arcana-num">I</div>
+            <div style="min-width:0; flex:1; overflow:hidden;">
+              <div style="font-size: 10px; color: var(--p4-yellow); font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">MAGICIAN ARCANA // RANK MAX</div>
+              <div class="card-heading" style="font-size:15px;">TG @Yroktan</div>
+            </div>
+          </a>
+
+          <a href="https://github.com/Yroktan" target="_blank" rel="noopener noreferrer" class="p4g-card arcana-card">
+            <div class="arcana-num">IV</div>
+            <div style="min-width:0; flex:1; overflow:hidden;">
+              <div style="font-size: 10px; color: var(--p4-yellow); font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">EMPEROR ARCANA // RANK MAX</div>
+              <div class="card-heading" style="font-size:15px;">GITHUB / Yroktan</div>
+            </div>
+          </a>
+
+          <a href="https://steamcommunity.com/id/Yroktan/" target="_blank" rel="noopener noreferrer" class="p4g-card arcana-card">
+            <div class="arcana-num">0</div>
+            <div style="min-width:0; flex:1; overflow:hidden;">
+              <div style="font-size: 10px; color: var(--p4-yellow); font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">FOOL ARCANA // RANK MAX</div>
+              <div class="card-heading" style="font-size:15px;">STEAM / Yroktan</div>
+            </div>
+          </a>
+
+          <div class="p4g-card arcana-card" style="opacity: 0.65;">
+            <div class="arcana-num" style="background:#222; color:#fff; border-color:#555;">XX</div>
+            <div style="min-width:0; flex:1; overflow:hidden;">
+              <div style="font-size: 10px; color: #888; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">JUDGEMENT ARCANA</div>
+              <div class="card-heading" style="font-size:15px;">MORE LINKS SOON</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: SYSTEM -->
+        <div class="p4g-panel" id="panel-4">
+          <div class="p4g-card card-row">
+            <div style="min-width:0; flex:1; overflow:hidden;">
+              <div class="card-heading">SFX AUDIO (WEB AUDIO API)</div>
+              <div class="card-desc">Persona dual-tone synthesized clicks</div>
+            </div>
+            <button id="sfx-btn" onclick="toggleSFX()" class="sys-btn active">ON</button>
+          </div>
+
+          <div class="p4g-card card-row">
+            <div style="min-width:0; flex:1; overflow:hidden;">
+              <div class="card-heading">INABA MIDNIGHT JUKEBOX</div>
+              <div class="card-desc">Load local music files (MP3/WAV), manage queue & audio player</div>
+            </div>
+            <button onclick="openJukebox()" class="sys-btn active">OPEN JUKEBOX</button>
+          </div>
+
+          <div class="p4g-card card-row">
+            <div style="min-width:0; flex:1; overflow:hidden;">
+              <div class="card-heading">CRT SCANLINES OVERLAY</div>
+              <div class="card-desc">Midnight Channel TV scanline filter</div>
+            </div>
+            <button id="scan-btn" onclick="toggleScanlines()" class="sys-btn active">ON</button>
+          </div>
+
+          <div class="p4g-card card-row">
+            <div style="min-width:0; flex:1; overflow:hidden;">
+              <div class="card-heading">INABA TICKER TAPE</div>
+              <div class="card-desc">Animated broadcast banner in background</div>
+            </div>
+            <button id="ticker-btn" onclick="toggleTicker()" class="sys-btn active">ON</button>
+          </div>
+
+          <div class="p4g-card card-row">
+            <div style="min-width:0; flex:1; overflow:hidden;">
+              <div class="card-heading">BRATSK WEATHER REFRESH</div>
+              <div class="card-desc">Query live telemetry from Open-Meteo API</div>
+            </div>
+            <button onclick="fetchBratskWeather()" class="sys-btn">REFRESH</button>
+          </div>
+
+          <div class="p4g-card card-row">
+            <div style="min-width:0; flex:1; overflow:hidden;">
+              <div class="card-heading">RESET DATA TO DEFAULT</div>
+              <div class="card-desc">Restore default Inaba quests, skills and projects</div>
+            </div>
+            <button onclick="resetDataToDefault()" class="sys-btn">RESET</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3. PROTAGONIST SHOWCASE (RIGHT COLUMN // DFT BATTLE STANCE WITH KATANA) -->
+    <section class="p4g-protagonist-area">
+      <div class="hero-sprite-container" id="hero-container" onclick="triggerHeroAction()" title="Click DFT to trigger Katana Strike!">
+        <!-- Shadow Silhouette Layer -->
+        <div class="hero-shadow-layer" id="hero-shadow"></div>
+        <!-- Battle Sprite: Yu Narukami in Katana Combat Stance -->
+        <img src="pose_battle.webp" alt="DFT Protagonist (Battle Stance)" class="hero-main-sprite" id="hero-sprite">
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================================================
+       BOTTOM STATUS HUD (LEVEL / HP / SP / MONEY / STANCE)
+       =================================================== -->
+  <footer class="p4g-footer">
+    <!-- Left: Protagonist Status -->
+    <div class="p4g-protag-stats">
+      <div class="skew protag-name-badge">
+        <span class="unskew">DFT // WILD CARD</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-label">LV</span>
+        <span>24</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-label">HP</span>
+        <span>320 / 320</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-label">SP</span>
+        <span style="color:var(--p4-yellow);">160 / 160</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-label">MONEY</span>
+        <span id="footer-money" style="color:var(--p4-yellow);">&#165; 128,450</span>
+      </div>
+    </div>
+
+    <!-- Center: Protagonist Stance Badge (Locked to Battle Pose) -->
+    <div class="stance-badge">
+      <span class="stat-label">STANCE</span>
+      <span style="color:var(--p4-yellow); letter-spacing: 0.5px;">BATTLE // KATANA</span>
+    </div>
+
+    <!-- Right: Controls Guide -->
+    <div class="controls-hint">
+      <span><span class="key-cap">▲▼</span> NAV</span>
+      <span><span class="key-cap">ENTER</span> ATTACK</span>
+      <span><span class="key-cap">M</span> MUTE</span>
+    </div>
+  </footer>
+
+  <!-- ===================================================
+       PERSONA 4 GOLDEN ENGINE SCRIPT
+       =================================================== -->
+  <script>
+    let activeIndex = 0;
+    let sfxOn = true;
+    let audioCtx = null;
+    let modalMode = 'task'; // 'task' or 'project'
+
+    const bgm = document.getElementById('bgm');
+    const eq = document.getElementById('eq');
+    const bgmStatus = document.getElementById('bgm-status');
+    const heroSprite = document.getElementById('hero-sprite');
+    const heroShadow = document.getElementById('hero-shadow');
+    const heroContainer = document.getElementById('hero-container');
+    const critFlash = document.getElementById('crit-flash');
+    const rewardToast = document.getElementById('reward-toast');
+    const footerMoney = document.getElementById('footer-money');
+
+    // Initialize shadow layer with battle sprite
+    heroShadow.style.backgroundImage = "url('pose_battle.webp')";
+
+    // ===================================================
+    // PERSISTENT DATA & REPLENISHMENT POOL (100% P4G)
+    // ===================================================
+    const DEFAULT_TASKS = [
+      {
+        id: 'task-1',
+        title: 'Midnight Channel Investigation',
+        desc: 'Tune in to the TV World broadcast at 00:00 during rain and foggy weather in Inaba.',
+        tag: '[MAIN QUEST]',
+        tagColor: 'var(--p4-orange)',
+        status: 'ACTIVE',
+        reward: 5000
+      },
+      {
+        id: 'task-2',
+        title: 'Deploy To Cloud Hosting',
+        desc: 'Publish the Investigation Unit website to GitHub Pages or Netlify for free public access.',
+        tag: '[SIDE QUEST]',
+        tagColor: '#38bdf8',
+        status: 'ACTIVE',
+        reward: 3500
+      },
+      {
+        id: 'task-3',
+        title: 'Hang Out After School',
+        desc: 'Spend time with Investigation Unit teammates across Inaba and rank up Social Links.',
+        tag: '[COMMU QUEST]',
+        tagColor: '#c084fc',
+        status: 'PENDING',
+        reward: 2000
+      }
+    ];
+
+    const DEFAULT_PROJECTS = [
+      {
+        id: 'proj-1',
+        title: 'PERSONA 4 GOLDEN // REVIVAL',
+        desc: 'Golden pause menu with DFT katana combat stance, live Bratsk weather telemetry, and Web Audio.',
+        badge: 'WEB APP',
+        tags: ['HTML5', 'WEB AUDIO', 'P4G ENGINE']
+      },
+      {
+        id: 'proj-2',
+        title: 'NEXT-GEN VAULT SLOT 02',
+        desc: 'Reserved vault slot for upcoming web tools, game projects, or bot utilities.',
+        badge: 'IN PROGRESS',
+        tags: ['RESERVED', 'PROTOTYPE']
+      }
+    ];
+
+    const REPLENISH_QUEST_POOL = [
+      {
+        title: 'Defeat Golden Shadow in Bathhouse',
+        desc: 'Infiltrate the Steamy Bathhouse dungeon and eliminate the rare golden hand enemy.',
+        tag: '[TV WORLD]',
+        tagColor: 'var(--p4-orange)',
+        reward: 8000
+      },
+      {
+        title: 'Find Lost Cat by Samegawa River',
+        desc: 'Search the riverbank in Inaba and feed dried fish to the stray calico cat.',
+        tag: '[SIDE QUEST]',
+        tagColor: '#38bdf8',
+        reward: 3000
+      },
+      {
+        title: 'Fuse Persona with Megido for Margaret',
+        desc: 'Enter the Velvet Room and complete the Empress Arcana fusion request.',
+        tag: '[VELVET ROOM]',
+        tagColor: '#00e5ff',
+        reward: 10000
+      },
+      {
+        title: 'Eat Mega Beef Bowl at Aiya',
+        desc: 'Take on the legendary rainy day food challenge in the Inaba Central Shopping District.',
+        tag: '[CHALLENGE]',
+        tagColor: 'var(--p4-yellow)',
+        reward: 4500
+      },
+      {
+        title: 'Catch River Guardian Fish',
+        desc: 'Use Inaba jewel beetles as bait at Samegawa River during the evening downpour.',
+        tag: '[SIDE QUEST]',
+        tagColor: '#38bdf8',
+        reward: 6000
+      },
+      {
+        title: 'Study at Yasogami High Library',
+        desc: 'Prepare for midterm examinations with Yosuke and Chie to boost Knowledge rank.',
+        tag: '[COMMU QUEST]',
+        tagColor: '#c084fc',
+        reward: 2500
+      }
+    ];
+
+    const REPLENISH_PROJECT_POOL = [
+      {
+        title: 'MIDNIGHT CHANNEL TV BOT',
+        desc: 'Discord webhook notification system alerting members when evening rain triggers fog.',
+        badge: 'BOT SERVICE',
+        tags: ['NODE.JS', 'DISCORD API', 'WEBHOOK']
+      },
+      {
+        title: 'VELVET ROOM FUSION CALCULATOR',
+        desc: 'Web-based Arcana fusion pathway finder for Persona 4 Golden compendium.',
+        badge: 'WEB APP',
+        tags: ['REACT', 'ALGORITHMS', 'P4G']
+      },
+      {
+        title: 'INABA WEATHER DESKTOP WIDGET',
+        desc: 'Electron desktop widget displaying real-time weather and Fog Alerts on PC desktop.',
+        badge: 'DESKTOP APP',
+        tags: ['ELECTRON', 'OPEN-METEO', 'API']
+      }
+    ];
+
+    const DEFAULT_SKILLS = [
+      {
+        id: 'skill-1',
+        name: '3D MODELLING',
+        element: 'PHYS / MODEL',
+        elemColor: 'var(--p4-yellow)',
+        tier: 1,
+        maxTier: 4,
+        desc: 'Hard-surface geometry, low-poly game assets, optimized meshes, and UV mapping.'
+      },
+      {
+        id: 'skill-2',
+        name: 'SITE CREATION',
+        element: 'AGI / WEB',
+        elemColor: 'var(--p4-orange)',
+        tier: 2,
+        maxTier: 4,
+        desc: 'Responsive layouts, next-generation styling, high-contrast UI, and motion design.'
+      },
+      {
+        id: 'skill-3',
+        name: 'JAVA ARCHITECTURE',
+        element: 'ZIO / CODE',
+        elemColor: '#eab308',
+        tier: 1,
+        maxTier: 4,
+        desc: 'Core language syntax, OOP design patterns, algorithms, and backend services.'
+      },
+      {
+        id: 'skill-4',
+        name: 'ROBLOX STUDIO',
+        element: 'BUFU / GAME',
+        elemColor: '#38bdf8',
+        tier: 1,
+        maxTier: 4,
+        desc: 'Scene assembly, environment design, physics simulation, and Lua game scripts.'
+      }
+    ];
+
+    let tasks = [];
+    let skills = [];
+    let projects = [];
+    let money = 128450;
+
+    let playlist = [
+      {
+        id: 'default-1',
+        name: 'Heartbeat, Heartbreak',
+        artist: 'Shoji Meguro (Persona 4 Golden OST)',
+        src: 'heartbeat.mp3',
+        badge: 'DEFAULT OST',
+        isCustom: false
+      },
+      {
+        id: 'default-2',
+        name: 'Your Affection',
+        artist: 'Shoji Meguro (Persona 4 Golden OST)',
+        src: 'https://ia800902.us.archive.org/3/items/persona-4-ost/1-04%20Your%20Affection.mp3',
+        badge: 'P4G STREAM',
+        isCustom: false
+      },
+      {
+        id: 'default-3',
+        name: 'Signs of Love',
+        artist: 'Shoji Meguro (Persona 4 Golden OST)',
+        src: 'https://ia800902.us.archive.org/3/items/persona-4-ost/1-06%20Signs%20of%20Love.mp3',
+        badge: 'P4G STREAM',
+        isCustom: false
+      }
+    ];
+    let currentTrackIndex = 0;
+    let loopMode = 'all';
+
+    function loadStoredData() {
+      try {
+        const storedTasks = localStorage.getItem('p4g_tasks');
+        tasks = storedTasks ? JSON.parse(storedTasks) : [...DEFAULT_TASKS];
+      } catch (e) {
+        tasks = [...DEFAULT_TASKS];
+      }
+
+      try {
+        const storedSkills = localStorage.getItem('p4g_skills');
+        skills = storedSkills ? JSON.parse(storedSkills) : [...DEFAULT_SKILLS];
+      } catch (e) {
+        skills = [...DEFAULT_SKILLS];
+      }
+
+      try {
+        const storedProjects = localStorage.getItem('p4g_projects');
+        projects = storedProjects ? JSON.parse(storedProjects) : [...DEFAULT_PROJECTS];
+      } catch (e) {
+        projects = [...DEFAULT_PROJECTS];
+      }
+
+      try {
+        const storedMoney = localStorage.getItem('p4g_money');
+        money = storedMoney ? parseInt(storedMoney, 10) : 128450;
+      } catch (e) {
+        money = 128450;
+      }
+
+      updateMoneyUI();
+      renderTasks();
+      renderSkills();
+      renderProjects();
+      renderPlaylist();
+      updateJukeboxDisplay();
+    }
+
+    function saveTasks() {
+      try {
+        localStorage.setItem('p4g_tasks', JSON.stringify(tasks));
+      } catch (e) {}
+    }
+
+    function saveSkills() {
+      try {
+        localStorage.setItem('p4g_skills', JSON.stringify(skills));
+      } catch (e) {}
+    }
+
+    function saveProjects() {
+      try {
+        localStorage.setItem('p4g_projects', JSON.stringify(projects));
+      } catch (e) {}
+    }
+
+    function saveMoney() {
+      try {
+        localStorage.setItem('p4g_money', String(money));
+      } catch (e) {}
+    }
+
+    function updateMoneyUI() {
+      if (footerMoney) {
+        footerMoney.innerHTML = `&#165; ${money.toLocaleString('en-US')}`;
+      }
+    }
+
+    function showToast(text) {
+      if (!rewardToast) return;
+      rewardToast.textContent = text;
+      rewardToast.classList.add('active');
+      setTimeout(() => {
+        rewardToast.classList.remove('active');
+      }, 2500);
+    }
+
+    // ===================================================
+    // TASK RENDERING & AUTO-REPLENISHMENT
+    // ===================================================
+    function renderTasks() {
+      const container = document.getElementById('tasks-list-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      // Check Auto-Replenishment: if active tasks < 3, auto-spawn a new quest!
+      const activeCount = tasks.filter(t => t.status !== 'DONE').length;
+      if (activeCount < 3) {
+        autoReplenishTask();
+      }
+
+      tasks.forEach((t) => {
+        const card = document.createElement('div');
+        const isDone = t.status === 'DONE';
+        card.className = `p4g-card ${isDone ? 'completed' : 'highlight'}`;
+        card.id = `task-card-${t.id}`;
+
+        card.innerHTML = `
+          <div class="card-row">
+            <span style="font-size: 11px; color: ${t.tagColor || 'var(--p4-orange)'}; font-weight: 800; white-space: nowrap;">${t.tag || '[QUEST]'}</span>
+            <div class="card-actions">
+              <span class="badge-status ${isDone ? 'status-done' : (t.status === 'ACTIVE' ? 'status-active' : 'status-pending')}">${t.status}</span>
+              ${!isDone ? `<button class="card-btn btn-done" onclick="completeTask('${t.id}')">COMPLETE</button>` : ''}
+              <button class="card-btn btn-delete" onclick="deleteTask('${t.id}')" title="Delete Quest">&#10005;</button>
+            </div>
+          </div>
+          <div class="card-heading" style="${isDone ? 'text-decoration: line-through; opacity: 0.8;' : ''}">${t.title}</div>
+          <div class="card-desc">${t.desc}</div>
+        `;
+        container.appendChild(card);
+      });
+
+      // Update window extra counter
+      const activeRemaining = tasks.filter(t => t.status !== 'DONE').length;
+      const extraEl = document.getElementById('window-extra');
+      if (extraEl && activeIndex === 0) {
+        extraEl.textContent = `${activeRemaining} ACTIVE`;
+      }
+    }
+
+    function completeTask(id) {
+      const task = tasks.find(t => t.id === id);
+      if (!task || task.status === 'DONE') return;
+
+      task.status = 'DONE';
+      const earned = task.reward || 5000;
+      money += earned;
+
+      saveTasks();
+      saveMoney();
+      updateMoneyUI();
+
+      // Persona Quest Fanfare blip
+      playBlip(523, 1046, 0.08, 'sine');
+      setTimeout(() => playBlip(1046, 1568, 0.12, 'triangle'), 60);
+
+      showToast(`+¥ ${earned.toLocaleString('en-US')} EXP & REWARD EARNED!`);
+      renderTasks();
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(t => t.id !== id);
+      saveTasks();
+      playBlip(700, 250, 0.04, 'sawtooth');
+      renderTasks();
+    }
+
+    function autoReplenishTask() {
+      // Check if there is a weather-reactive quest available
+      const b = getBratskDate();
+      const existingTitles = new Set(tasks.map(t => t.title));
+      
+      // Candidate pool
+      const candidates = REPLENISH_QUEST_POOL.filter(p => !existingTitles.has(p.title));
+      if (candidates.length === 0) return;
+
+      const picked = candidates[Math.floor(Math.random() * candidates.length)];
+      const newTask = {
+        id: 'task-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+        title: picked.title,
+        desc: picked.desc,
+        tag: picked.tag,
+        tagColor: picked.tagColor,
+        status: 'ACTIVE',
+        reward: picked.reward
+      };
+
+      tasks.push(newTask);
+      saveTasks();
+    }
+
+    // ===================================================
+    // SKILL RENDERING & TIER SYSTEM
+    // ===================================================
+    function getTierBadgeClass(tier) {
+      if (tier === 1) return 'status-tier-1';
+      if (tier === 2) return 'status-tier-2';
+      if (tier === 3) return 'status-tier-3';
+      return 'status-tier-max';
+    }
+
+    function getTierLabel(tier) {
+      if (tier >= 4) return 'TIER MAX ★';
+      return `TIER ${tier}`;
+    }
+
+    function renderSkills() {
+      const container = document.getElementById('skills-list-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      skills.forEach((s) => {
+        const card = document.createElement('div');
+        const isMax = s.tier >= 4;
+        const isHigh = s.tier === 3;
+        card.className = `p4g-card ${isMax ? 'maxed' : (isHigh ? 'highlight' : '')}`;
+        card.id = `skill-card-${s.id}`;
+
+        const tierClass = getTierBadgeClass(s.tier);
+        const tierLabel = getTierLabel(s.tier);
+
+        card.innerHTML = `
+          <div class="card-row">
+            <span class="element-badge" style="border-color:${s.elemColor || 'var(--p4-yellow)'}; color:${s.elemColor || 'var(--p4-yellow)'};">${s.element || 'PHYS'}</span>
+            <div class="card-actions">
+              <span class="badge-status ${tierClass}" onclick="cycleSkillTier('${s.id}')" style="cursor:pointer;" title="Click to cycle Tier">${tierLabel}</span>
+              <button class="card-btn" onclick="changeSkillTier('${s.id}', -1)" title="Decrease Tier" ${s.tier <= 1 ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}>▼ TIER -</button>
+              <button class="card-btn ${isMax ? '' : 'btn-tier-up'}" onclick="changeSkillTier('${s.id}', 1)" title="Upgrade Tier" ${isMax ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''}>${isMax ? 'MAX ★' : '▲ RANK UP'}</button>
+              <button class="card-btn btn-delete" onclick="deleteSkill('${s.id}')" title="Delete Skill">&#10005;</button>
+            </div>
+          </div>
+          <div class="card-heading">${s.name}</div>
+          <div class="card-desc">${s.desc}</div>
+        `;
+        container.appendChild(card);
+      });
+
+      const extraEl = document.getElementById('window-extra');
+      if (extraEl && activeIndex === 1) {
+        const maxedCount = skills.filter(s => s.tier >= 4).length;
+        extraEl.textContent = `${skills.length} SKILLS // ${maxedCount} MAX`;
+      }
+    }
+
+    function changeSkillTier(id, delta) {
+      const skill = skills.find(s => s.id === id);
+      if (!skill) return;
+      const oldTier = skill.tier;
+      const newTier = Math.max(1, Math.min(skill.maxTier || 4, skill.tier + delta));
+      if (oldTier === newTier) return;
+
+      skill.tier = newTier;
+      saveSkills();
+      renderSkills();
+
+      if (delta > 0) {
+        playLevelUpSFX();
+        const label = getTierLabel(newTier);
+        showToast(`SKILL RANK UP! [${skill.name}] ➔ ${label}`);
+      } else {
+        playBlip(600, 300, 0.05, 'triangle');
+        showToast(`SKILL ADJUSTED: [${skill.name}] ➔ TIER ${newTier}`);
+      }
+    }
+
+    function cycleSkillTier(id) {
+      const skill = skills.find(s => s.id === id);
+      if (!skill) return;
+      const nextTier = (skill.tier % (skill.maxTier || 4)) + 1;
+      changeSkillTier(id, nextTier - skill.tier);
+    }
+
+    function deleteSkill(id) {
+      skills = skills.filter(s => s.id !== id);
+      saveSkills();
+      playBlip(700, 250, 0.04, 'sawtooth');
+      renderSkills();
+    }
+
+    function playLevelUpSFX() {
+      if (!sfxOn) return;
+      try {
+        const ctx = getAudio();
+        const freqs = [523.25, 659.25, 783.99, 1046.50];
+        freqs.forEach((freq, idx) => {
+          setTimeout(() => {
+            try {
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(freq, ctx.currentTime);
+              gain.gain.setValueAtTime(0.18, ctx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.28);
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+              osc.start();
+              osc.stop(ctx.currentTime + 0.28);
+            } catch(e) {}
+          }, idx * 65);
+        });
+      } catch(e) {}
+    }
+
+    // ===================================================
+    // PROJECT RENDERING & AUTO-REPLENISHMENT
+    // ===================================================
+    function renderProjects() {
+      const container = document.getElementById('projects-list-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (projects.length === 0) {
+        autoReplenishProject();
+      }
+
+      projects.forEach((p) => {
+        const card = document.createElement('div');
+        card.className = 'p4g-card highlight';
+        card.id = `proj-card-${p.id}`;
+
+        const tagsHtml = (p.tags || []).map(tag => 
+          `<span style="font-size:10px; background:#000; color:var(--p4-yellow); padding:2px 6px; font-weight:800; border:1px solid #333; white-space:nowrap;">${tag}</span>`
+        ).join(' ');
+
+        card.innerHTML = `
+          <div class="card-row">
+            <span class="card-heading">${p.title}</span>
+            <div class="card-actions">
+              <span class="badge-status status-active">${p.badge || 'PROJECT'}</span>
+              <button class="card-btn btn-delete" onclick="deleteProject('${p.id}')" title="Delete Project">&#10005;</button>
+            </div>
+          </div>
+          <div class="card-desc">${p.desc}</div>
+          <div style="display:flex; gap:6px; margin-top:4px; flex-wrap:wrap;">
+            ${tagsHtml}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      const extraEl = document.getElementById('window-extra');
+      if (extraEl && activeIndex === 2) {
+        extraEl.textContent = `SLOT ${projects.length}/4`;
+      }
+    }
+
+    function deleteProject(id) {
+      projects = projects.filter(p => p.id !== id);
+      saveProjects();
+      playBlip(700, 250, 0.04, 'sawtooth');
+      renderProjects();
+    }
+
+    function autoReplenishProject() {
+      const existingTitles = new Set(projects.map(p => p.title));
+      const candidates = REPLENISH_PROJECT_POOL.filter(p => !existingTitles.has(p.title));
+      if (candidates.length === 0) return;
+
+      const picked = candidates[Math.floor(Math.random() * candidates.length)];
+      const newProj = {
+        id: 'proj-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+        title: picked.title,
+        desc: picked.desc,
+        badge: picked.badge,
+        tags: picked.tags
+      };
+
+      projects.push(newProj);
+      saveProjects();
+    }
+
+    // ===================================================
+    // MODAL DIALOG FOR MANUAL ADDING
+    // ===================================================
+    function handleHeaderAction() {
+      if (activeIndex === 0) {
+        openModal('task');
+      } else if (activeIndex === 1) {
+        openModal('skill');
+      } else if (activeIndex === 2) {
+        openModal('project');
+      } else {
+        triggerHeroAction();
+      }
+    }
+
+    function openModal(mode) {
+      modalMode = mode;
+      const modal = document.getElementById('quick-modal');
+      const title = document.getElementById('modal-title');
+      const inputTitle = document.getElementById('modal-input-title');
+      const inputDesc = document.getElementById('modal-input-desc');
+
+      if (mode === 'task') {
+        title.textContent = 'NEW INABA INVESTIGATION QUEST';
+        inputTitle.placeholder = 'Quest Title (e.g. Check Aiya restaurant for rumors)';
+        inputDesc.placeholder = 'Quest Description (e.g. Talk to customers during foggy afternoon)';
+      } else if (mode === 'skill') {
+        title.textContent = 'NEW PERSONA SKILL CARD';
+        inputTitle.placeholder = 'Skill Name (e.g. PYTHON AUTOMATION, KENDO, SHADER GRAPH)';
+        inputDesc.placeholder = 'Element & Description (e.g. ZIO / SCRIPT // Automated web tools)';
+      } else {
+        title.textContent = 'NEW PROJECT ARCHIVE SLOT';
+        inputTitle.placeholder = 'Project Name (e.g. Velvet Room Fusion App)';
+        inputDesc.placeholder = 'Project Scope (e.g. Web calculator with GitHub Pages sync)';
+      }
+
+      inputTitle.value = '';
+      inputDesc.value = '';
+      modal.classList.add('active');
+      inputTitle.focus();
+      playBlip(900, 500, 0.04, 'triangle');
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('quick-modal');
+      modal.classList.remove('active');
+      playBlip(600, 300, 0.04, 'triangle');
+    }
+
+    function confirmModal() {
+      const inputTitle = document.getElementById('modal-input-title');
+      const inputDesc = document.getElementById('modal-input-desc');
+      const title = inputTitle.value.trim();
+      const desc = inputDesc.value.trim();
+
+      if (!title) {
+        inputTitle.focus();
+        return;
+      }
+
+      if (modalMode === 'task') {
+        const newTask = {
+          id: 'task-' + Date.now(),
+          title: title,
+          desc: desc || 'Custom investigation task created by DFT.',
+          tag: '[SIDE QUEST]',
+          tagColor: '#38bdf8',
+          status: 'ACTIVE',
+          reward: 4000
+        };
+        tasks.unshift(newTask);
+        saveTasks();
+        renderTasks();
+        showToast('NEW INVESTIGATION QUEST LOGGED!');
+      } else if (modalMode === 'skill') {
+        const newSkill = {
+          id: 'skill-' + Date.now(),
+          name: title.toUpperCase(),
+          element: 'ALMIGHTY / TECH',
+          elemColor: 'var(--p4-cyan)',
+          tier: 1,
+          maxTier: 4,
+          desc: desc || 'Custom Persona skill trained by DFT.'
+        };
+        skills.unshift(newSkill);
+        saveSkills();
+        renderSkills();
+        showToast('NEW SKILL LEARNED: ' + title.toUpperCase());
+        playLevelUpSFX();
+      } else {
+        const newProj = {
+          id: 'proj-' + Date.now(),
+          title: title,
+          desc: desc || 'Custom project initiative logged in Vault.',
+          badge: 'ACTIVE DEV',
+          tags: ['P4G', 'INABA DEV', 'WEB']
+        };
+        projects.unshift(newProj);
+        saveProjects();
+        renderProjects();
+        showToast('NEW PROJECT VAULT SLOT CREATED!');
+      }
+
+      closeModal();
+      playBlip(1200, 800, 0.05, 'triangle');
+    }
+
+    function resetDataToDefault() {
+      tasks = [...DEFAULT_TASKS];
+      skills = [...DEFAULT_SKILLS];
+      projects = [...DEFAULT_PROJECTS];
+      money = 128450;
+      saveTasks();
+      saveSkills();
+      saveProjects();
+      saveMoney();
+      updateMoneyUI();
+      renderTasks();
+      renderSkills();
+      renderProjects();
+      clearCustomTracks();
+      showToast('DATA RESTORED TO DEFAULT INABA STATE!');
+      playBlip(800, 1200, 0.08, 'triangle');
+    }
+
+    // ===================================================
+    // INABA JUKEBOX & AUDIO ENGINE
+    // ===================================================
+    function openJukebox() {
+      const modal = document.getElementById('jukebox-modal');
+      if (!modal) return;
+      modal.classList.add('active');
+      renderPlaylist();
+      updateJukeboxDisplay();
+      playBlip(900, 500, 0.04, 'triangle');
+    }
+
+    function closeJukebox() {
+      const modal = document.getElementById('jukebox-modal');
+      if (!modal) return;
+      modal.classList.remove('active');
+      playBlip(600, 300, 0.04, 'triangle');
+    }
+
+    function formatTime(secs) {
+      if (!secs || isNaN(secs)) return '00:00';
+      const m = Math.floor(secs / 60);
+      const s = Math.floor(secs % 60);
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function updateJukeboxDisplay() {
+      const cur = playlist[currentTrackIndex] || playlist[0];
+      if (!cur) return;
+
+      const titleEl = document.getElementById('jb-track-title');
+      const subEl = document.getElementById('jb-track-sub');
+      const badgeEl = document.getElementById('jb-track-badge');
+      const timeEl = document.getElementById('jb-track-time');
+      const playBtn = document.getElementById('jb-play-btn');
+      const bgmTitleEl = document.getElementById('bgm-title');
+
+      if (titleEl) titleEl.textContent = cur.name;
+      if (subEl) subEl.textContent = cur.artist;
+      if (badgeEl) badgeEl.textContent = cur.badge;
+      if (bgmTitleEl) bgmTitleEl.textContent = cur.name.toUpperCase();
+
+      const curTime = bgm ? bgm.currentTime : 0;
+      const durTime = bgm ? bgm.duration : 0;
+      if (timeEl) timeEl.textContent = `${formatTime(curTime)} / ${formatTime(durTime)}`;
+
+      if (playBtn) {
+        playBtn.textContent = (bgm && !bgm.paused) ? '⏸ PAUSE' : '▶ PLAY';
+        playBtn.style.background = (bgm && !bgm.paused) ? 'var(--p4-orange)' : 'var(--p4-yellow)';
+      }
+    }
+
+    function renderPlaylist() {
+      const listEl = document.getElementById('jb-playlist-list');
+      const countEl = document.getElementById('jb-playlist-count');
+      if (!listEl) return;
+      listEl.innerHTML = '';
+      if (countEl) countEl.textContent = playlist.length;
+
+      playlist.forEach((tr, idx) => {
+        const item = document.createElement('div');
+        const isCurrent = idx === currentTrackIndex;
+        item.className = `jb-playlist-item ${isCurrent ? 'active' : ''}`;
+        item.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px; min-width:0; flex:1;" onclick="loadAndPlayTrack(${idx})">
+            <span style="font-size:12px; font-weight:800; color:${isCurrent ? 'var(--p4-yellow)' : '#64748b'}; width:20px;">${String(idx + 1).padStart(2, '0')}</span>
+            <div style="min-width:0; flex:1;">
+              <div style="font-size:13px; font-weight:800; color:${isCurrent ? 'var(--p4-yellow)' : '#fff'}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${tr.name}</div>
+              <div style="font-size:10px; color:#94a3b8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${tr.artist}</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+            <span style="font-size:9px; background:#000; color:${tr.isCustom ? 'var(--p4-cyan)' : 'var(--p4-orange)'}; padding:1px 5px; font-weight:800; border:1px solid #333;">${tr.badge}</span>
+            <button class="card-btn" onclick="event.stopPropagation(); loadAndPlayTrack(${idx})" style="padding:2px 6px; font-size:10px;">${isCurrent && bgm && !bgm.paused ? '⏸' : '▶'}</button>
+            ${tr.isCustom ? `<button class="card-btn btn-delete" onclick="event.stopPropagation(); removeCustomTrack(${idx})" title="Remove Track" style="padding:2px 6px; font-size:10px;">&#10005;</button>` : ''}
+          </div>
+        `;
+        listEl.appendChild(item);
+      });
+    }
+
+    function loadAndPlayTrack(index) {
+      if (index < 0 || index >= playlist.length) return;
+      currentTrackIndex = index;
+      const track = playlist[currentTrackIndex];
+      bgm.src = track.src;
+      bgm.load();
+      bgm.play().then(() => {
+        eq.classList.remove('eq-paused');
+        bgmStatus.textContent = 'PAUSE';
+      }).catch(() => {});
+      updateJukeboxDisplay();
+      renderPlaylist();
+    }
+
+    function nextTrack() {
+      const nextIdx = (currentTrackIndex + 1) % playlist.length;
+      loadAndPlayTrack(nextIdx);
+    }
+
+    function prevTrack() {
+      const prevIdx = (currentTrackIndex - 1 + playlist.length) % playlist.length;
+      loadAndPlayTrack(prevIdx);
+    }
+
+    function toggleLoop() {
+      loopMode = loopMode === 'all' ? 'one' : 'all';
+      const loopBtn = document.getElementById('jb-loop-btn');
+      if (loopBtn) {
+        loopBtn.textContent = loopMode === 'all' ? 'LOOP: ALL' : 'LOOP: ONE';
+        loopBtn.classList.toggle('btn-tier-up', loopMode === 'one');
+      }
+      playBlip(700, 350, 0.04);
+    }
+
+    function handleTimelineSeek(e) {
+      if (!bgm || !bgm.duration) return;
+      const pct = parseFloat(e.target.value);
+      bgm.currentTime = (pct / 100) * bgm.duration;
+    }
+
+    function handleVolumeChange(e) {
+      if (!bgm) return;
+      bgm.volume = parseFloat(e.target.value);
+    }
+
+    function handleAudioUpload(e) {
+      const files = e.target.files;
+      if (!files || !files.length) return;
+      addAudioFiles(files);
+      e.target.value = '';
+    }
+
+    function addAudioFiles(files) {
+      let firstAdded = -1;
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (!file.type.startsWith('audio/') && !file.name.match(/\.(mp3|wav|ogg|flac|m4a|aac)$/i)) continue;
+        const url = URL.createObjectURL(file);
+        const cleanName = file.name.replace(/\.[^/.]+$/, "");
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+        const newTrack = {
+          id: 'custom-' + Date.now() + '-' + i,
+          name: cleanName,
+          artist: `Local Audio File (${sizeMb} MB)`,
+          src: url,
+          badge: 'CUSTOM FILE',
+          isCustom: true
+        };
+        playlist.push(newTrack);
+        if (firstAdded === -1) firstAdded = playlist.length - 1;
+      }
+      renderPlaylist();
+      if (firstAdded !== -1) {
+        loadAndPlayTrack(firstAdded);
+        showToast(`TRACK LOADED: ${playlist[firstAdded].name}`);
+        playBlip(1000, 1600, 0.08, 'triangle');
+      }
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.currentTarget.classList.add('drag-active');
+    }
+    function handleDragLeave(e) {
+      e.currentTarget.classList.remove('drag-active');
+    }
+    function handleDrop(e) {
+      e.preventDefault();
+      e.currentTarget.classList.remove('drag-active');
+      if (e.dataTransfer && e.dataTransfer.files) {
+        addAudioFiles(e.dataTransfer.files);
+      }
+    }
+
+    function removeCustomTrack(idx) {
+      if (idx === currentTrackIndex) {
+        nextTrack();
+      }
+      playlist.splice(idx, 1);
+      if (currentTrackIndex >= playlist.length) {
+        currentTrackIndex = Math.max(0, playlist.length - 1);
+      }
+      renderPlaylist();
+      updateJukeboxDisplay();
+      playBlip(600, 300, 0.04);
+    }
+
+    function clearCustomTracks() {
+      playlist = playlist.filter(t => !t.isCustom);
+      currentTrackIndex = 0;
+      loadAndPlayTrack(0);
+      renderPlaylist();
+      updateJukeboxDisplay();
+      showToast('CUSTOM TRACKS CLEARED');
+      playBlip(700, 350, 0.04);
+    }
+
+    function toggleBGM() {
+      if (bgm.paused) {
+        bgm.play().then(() => {
+          eq.classList.remove('eq-paused');
+          bgmStatus.textContent = 'PAUSE';
+          updateJukeboxDisplay();
+        }).catch(() => {});
+      } else {
+        bgm.pause();
+        eq.classList.add('eq-paused');
+        bgmStatus.textContent = 'PLAY';
+        updateJukeboxDisplay();
+      }
+      playBlip(600, 300, 0.04);
+    }
+
+    function initUserMedia() {
+      if (bgm.paused) {
+        bgm.play().then(() => {
+          eq.classList.remove('eq-paused');
+          bgmStatus.textContent = 'PAUSE';
+          updateJukeboxDisplay();
+        }).catch(() => {});
+      }
+      getAudio();
+    }
+    document.addEventListener('touchstart', initUserMedia, { once: true });
+    document.addEventListener('click', initUserMedia, { once: true });
+
+    bgm.addEventListener('timeupdate', () => {
+      const timeline = document.getElementById('jb-timeline');
+      const timeEl = document.getElementById('jb-track-time');
+      if (timeline && bgm.duration) {
+        timeline.value = (bgm.currentTime / bgm.duration) * 100;
+      }
+      if (timeEl) {
+        timeEl.textContent = `${formatTime(bgm.currentTime)} / ${formatTime(bgm.duration)}`;
+      }
+    });
+
+    bgm.addEventListener('ended', () => {
+      if (loopMode === 'one') {
+        bgm.currentTime = 0;
+        bgm.play().catch(() => {});
+      } else {
+        nextTrack();
+      }
+    });
+
+    function getAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playBlip(startFreq = 960, endFreq = 480, duration = 0.05, type = 'triangle') {
+      if (!sfxOn) return;
+      try {
+        const ctx = getAudio();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(startFreq, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(endFreq, ctx.currentTime + duration);
+        gain.gain.setValueAtTime(0.14, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function triggerHeroAction() {
+      playBlip(500, 1500, 0.08, 'sawtooth');
+      setTimeout(() => playBlip(1800, 900, 0.1, 'triangle'), 60);
+
+      heroContainer.classList.remove('pulse-action');
+      void heroContainer.offsetWidth;
+      heroContainer.classList.add('pulse-action');
+
+      critFlash.classList.add('flash');
+      setTimeout(() => {
+        critFlash.classList.remove('flash');
+      }, 350);
+    }
+
+    const windowData = [
+      { tag: 'INVESTIGATION LOG', title: 'CURRENT TASKS', extra: '3 ACTIVE', action: '+ ADD' },
+      { tag: 'SKILL CARDS', title: 'PERSONA SKILLS', extra: '4 SKILLS', action: '+ ADD' },
+      { tag: 'INVENTORY ARCHIVE', title: 'PROJECT VAULT', extra: 'SLOT 2/4', action: '+ ADD' },
+      { tag: 'BONDS & CONFIDANTS', title: 'SOCIAL LINKS', extra: 'MAX BONDS', action: '' },
+      { tag: 'OPTIONS', title: 'SYSTEM CONFIG', extra: 'GOLDEN VER 4.0', action: '' }
+    ];
+
+    function switchTab(index) {
+      if (index === activeIndex) return;
+      
+      playBlip(1200, 700, 0.04, 'triangle');
+      setTimeout(() => playBlip(1600, 900, 0.06, 'sine'), 25);
+
+      heroContainer.classList.remove('pulse-action');
+      void heroContainer.offsetWidth;
+      heroContainer.classList.add('pulse-action');
+
+      document.getElementById('btn-' + activeIndex).classList.remove('active');
+      document.getElementById('panel-' + activeIndex).classList.remove('active');
+
+      activeIndex = index;
+
+      document.getElementById('btn-' + activeIndex).classList.add('active');
+      document.getElementById('panel-' + activeIndex).classList.add('active');
+
+      document.getElementById('window-tag').textContent = windowData[activeIndex].tag;
+      document.getElementById('window-title').textContent = windowData[activeIndex].title;
+      
+      const actionBtn = document.getElementById('header-action-btn');
+      if (windowData[activeIndex].action) {
+        actionBtn.style.display = 'inline-block';
+        actionBtn.textContent = windowData[activeIndex].action;
+      } else {
+        actionBtn.style.display = 'none';
+      }
+
+      if (activeIndex === 0) {
+        const remaining = tasks.filter(t => t.status !== 'DONE').length;
+        document.getElementById('window-extra').textContent = `${remaining} ACTIVE`;
+      } else if (activeIndex === 1) {
+        const maxedCount = skills.filter(s => s.tier >= 4).length;
+        document.getElementById('window-extra').textContent = `${skills.length} SKILLS // ${maxedCount} MAX`;
+      } else if (activeIndex === 2) {
+        document.getElementById('window-extra').textContent = `SLOT ${projects.length}/4`;
+      } else {
+        document.getElementById('window-extra').textContent = windowData[activeIndex].extra;
+      }
+    }
+
+    function toggleSFX() {
+      sfxOn = !sfxOn;
+      const btn = document.getElementById('sfx-btn');
+      btn.textContent = sfxOn ? 'ON' : 'OFF';
+      btn.classList.toggle('active', sfxOn);
+      if (sfxOn) playBlip(880, 440, 0.05);
+    }
+
+    function toggleScanlines() {
+      const el = document.querySelector('.scanlines');
+      const btn = document.getElementById('scan-btn');
+      const isVisible = el.style.display !== 'none';
+      el.style.display = isVisible ? 'none' : 'block';
+      btn.textContent = isVisible ? 'OFF' : 'ON';
+      btn.classList.toggle('active', !isVisible);
+      playBlip(700, 350, 0.04);
+    }
+
+    function toggleTicker() {
+      const el = document.querySelector('.bg-ticker');
+      const btn = document.getElementById('ticker-btn');
+      const isVisible = el.style.display !== 'none';
+      el.style.display = isVisible ? 'none' : 'flex';
+      btn.textContent = isVisible ? 'OFF' : 'ON';
+      btn.classList.toggle('active', !isVisible);
+      playBlip(700, 350, 0.04);
+    }
+
+    // Keyboard Navigation
+    window.addEventListener('keydown', (e) => {
+      // If modal is open, don't trigger game hotkeys
+      const modal = document.getElementById('quick-modal');
+      if (modal && modal.classList.contains('active')) {
+        if (e.key === 'Escape') closeModal();
+        if (e.key === 'Enter') confirmModal();
+        return;
+      }
+
+      const jbModal = document.getElementById('jukebox-modal');
+      if (jbModal && jbModal.classList.contains('active')) {
+        if (e.key === 'Escape') closeJukebox();
+        return;
+      }
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        switchTab((activeIndex + 1) % 5);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        switchTab((activeIndex - 1 + 5) % 5);
+      } else if (e.key.toLowerCase() === 'm') {
+        e.preventDefault();
+        toggleBGM();
+      } else if (e.key === ' ' || e.key === 'Enter') {
+        triggerHeroAction();
+      }
+    });
+
+    // 3D Parallax & Mouse Tracking
+    if (window.innerWidth >= 900) {
+      document.addEventListener('mousemove', (e) => {
+        const xOffset = (e.clientX / window.innerWidth - 0.5) * 10;
+        const yOffset = (e.clientY / window.innerHeight - 0.5) * 8;
+        if (heroContainer) {
+          heroContainer.style.transform = `rotate(2deg) translate3d(${xOffset}px, ${yOffset}px, 0)`;
+        }
+      });
+    }
+
+    // ===================================================
+    // REAL-TIME BRATSK CLOCK & LIVE WEATHER INTEGRATION
+    // Timezone: Asia/Irkutsk (UTC+8)
+    // ===================================================
+    function getBratskDate() {
+      const now = new Date();
+      try {
+        const parts = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'Asia/Irkutsk',
+          month: 'numeric',
+          day: 'numeric',
+          weekday: 'short',
+          hour: 'numeric',
+          minute: 'numeric',
+          second: 'numeric',
+          hour12: false
+        }).formatToParts(now);
+
+        const map = {};
+        for (const p of parts) map[p.type] = p.value;
+        const hour = parseInt(map.hour, 10) % 24;
+        return {
+          month: parseInt(map.month, 10),
+          day: parseInt(map.day, 10),
+          weekday: (map.weekday || 'MON').toUpperCase(),
+          hour: hour,
+          minute: parseInt(map.minute, 10),
+          second: parseInt(map.second, 10),
+          hourStr: String(hour).padStart(2, '0'),
+          minStr: String(map.minute).padStart(2, '0'),
+          secStr: String(map.second).padStart(2, '0')
+        };
+      } catch (e) {
+        const utcMs = now.getTime() + (now.getTimezoneOffset() * 60000);
+        const bratskMs = utcMs + (8 * 3600000);
+        const d = new Date(bratskMs);
+        const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+        return {
+          month: d.getMonth() + 1,
+          day: d.getDate(),
+          weekday: days[d.getDay()],
+          hour: d.getHours(),
+          minute: d.getMinutes(),
+          second: d.getSeconds(),
+          hourStr: String(d.getHours()).padStart(2, '0'),
+          minStr: String(d.getMinutes()).padStart(2, '0'),
+          secStr: String(d.getSeconds()).padStart(2, '0')
+        };
+      }
+    }
+
+    function getPersonaTimeSlot(hour, weekday) {
+      if (hour >= 0 && hour < 5) return 'DARK HOUR';
+      if (hour >= 5 && hour < 8) return 'EARLY MORNING';
+      if (hour >= 8 && hour < 12) return 'MORNING';
+      if (hour >= 12 && hour < 13) return 'LUNCHTIME';
+      if (hour >= 13 && hour < 16) return (weekday === 'SUN' || weekday === 'SAT') ? 'DAYTIME' : 'AFTERNOON';
+      if (hour >= 16 && hour < 19) return (weekday === 'SUN') ? 'EVENING WALK' : 'AFTER SCHOOL';
+      if (hour >= 19 && hour < 22) return 'EVENING';
+      return 'MIDNIGHT';
+    }
+
+    function updateBratskClock() {
+      const clockEl = document.getElementById('bratsk-clock');
+      if (!clockEl) return;
+      const b = getBratskDate();
+      const slot = getPersonaTimeSlot(b.hour, b.weekday);
+      clockEl.textContent = `${b.month}/${b.day} [${b.weekday}] ${b.hourStr}:${b.minStr} // ${slot}`;
+    }
+
+    function parseWeatherCode(code, isDay) {
+      switch (code) {
+        case 0:
+          return isDay ? 'CLEAR SKY' : 'CLEAR NIGHT';
+        case 1:
+          return isDay ? 'MAINLY CLEAR' : 'CLEAR NIGHT';
+        case 2:
+          return 'PARTLY CLOUDY';
+        case 3:
+          return 'OVERCAST';
+        case 45:
+        case 48:
+          return 'FOG ALERT';
+        case 51:
+        case 53:
+        case 55:
+          return 'LIGHT DRIZZLE';
+        case 56:
+        case 57:
+          return 'FREEZING DRIZZLE';
+        case 61:
+          return 'LIGHT RAIN';
+        case 63:
+          return 'RAIN ALERT';
+        case 65:
+          return 'HEAVY RAIN';
+        case 66:
+        case 67:
+          return 'FREEZING RAIN';
+        case 71:
+          return 'LIGHT SNOW';
+        case 73:
+          return 'SNOW FALL';
+        case 75:
+          return 'HEAVY SNOW';
+        case 77:
+          return 'SNOW GRAINS';
+        case 80:
+        case 81:
+          return 'RAIN SHOWER';
+        case 82:
+          return 'TORRENTIAL RAIN';
+        case 85:
+        case 86:
+          return 'SNOW SHOWER';
+        case 95:
+          return 'THUNDERSTORM';
+        case 96:
+        case 99:
+          return 'HEAVY STORM';
+        default:
+          return isDay ? 'MILD CLOUDY' : 'CLEAR NIGHT';
+      }
+    }
+
+    function formatTemperature(temp) {
+      if (temp === undefined || temp === null || isNaN(temp)) return '';
+      const rounded = Math.round(temp * 10) / 10;
+      const sign = rounded > 0 ? '+' : '';
+      return `${sign}${rounded}°C`;
+    }
+
+    const BRATSK_LAT = 56.15;
+    const BRATSK_LON = 101.63;
+    const WEATHER_URL = `https://api.open-meteo.com/v1/forecast?latitude=${BRATSK_LAT}&longitude=${BRATSK_LON}&current_weather=true`;
+
+    async function fetchBratskWeather() {
+      const weatherEl = document.getElementById('bratsk-weather');
+      const pulseEl = document.getElementById('weather-pulse');
+      if (!weatherEl) return;
+
+      try {
+        const res = await fetch(WEATHER_URL, { cache: 'no-cache' });
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        const data = await res.json();
+        if (data && data.current_weather) {
+          const cur = data.current_weather;
+          const tempStr = formatTemperature(cur.temperature);
+          const condition = parseWeatherCode(cur.weathercode, cur.is_day);
+          const displayText = `BRATSK // ${tempStr} ${condition}`;
+          weatherEl.textContent = displayText;
+
+          if (pulseEl) {
+            if (condition.includes('ALERT') || condition.includes('STORM') || condition.includes('RAIN')) {
+              pulseEl.style.background = 'var(--p4-orange)';
+              pulseEl.style.boxShadow = '0 0 8px var(--p4-orange)';
+            } else if (condition.includes('SNOW') || condition.includes('FREEZING')) {
+              pulseEl.style.background = 'var(--p4-cyan)';
+              pulseEl.style.boxShadow = '0 0 8px var(--p4-cyan)';
+            } else if (condition.includes('CLEAR')) {
+              pulseEl.style.background = 'var(--p4-yellow)';
+              pulseEl.style.boxShadow = '0 0 8px var(--p4-yellow-glow)';
+            } else {
+              pulseEl.style.background = '#94a3b8';
+              pulseEl.style.boxShadow = 'none';
+            }
+          }
+
+          try {
+            localStorage.setItem('p4g_bratsk_weather', JSON.stringify({
+              text: displayText,
+              time: Date.now()
+            }));
+          } catch (e) {}
+          return;
+        }
+      } catch (err) {
+        console.warn('Live weather fetch notice (using cache/fallback):', err);
+      }
+
+      // Fallback: check localStorage cache
+      try {
+        const cached = localStorage.getItem('p4g_bratsk_weather');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && parsed.text) {
+            weatherEl.textContent = parsed.text;
+            return;
+          }
+        }
+      } catch (e) {}
+
+      // Default seasonal/time fallback
+      const b = getBratskDate();
+      const isNight = b.hour < 6 || b.hour >= 20;
+      weatherEl.textContent = `BRATSK // +0.8°C ${isNight ? 'CLEAR NIGHT' : 'MAINLY CLEAR'}`;
+    }
+
+    // Initialize on load
+    loadStoredData();
+    updateBratskClock();
+    setInterval(updateBratskClock, 1000);
+    fetchBratskWeather();
+    setInterval(fetchBratskWeather, 600000);
+  </script>
+</body>
+</html>
